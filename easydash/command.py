@@ -6,8 +6,8 @@ import json
 
 def main():
     args = ArgParser('dash')
-    resource_type = args.register('resource_type', named=False)
-    command = args.register('command', named=False)
+    resource_type = args.register('resource_type', named=False, values=('ecs-service',))
+    command = args.register('command', named=False, values=('show', 'deploy'))
     region = args.register('region', default='eu-west-1')
     args.validate()
 
