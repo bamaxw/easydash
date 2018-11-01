@@ -9,7 +9,7 @@ config = {
             'metrics': [
                 ('HTTPCode_Target_4XX_Count', {'color': '#9467bd', 'label': '4xx'}),
                 ('HTTPCode_Target_3XX_Count', {'color': '#e377c2', 'label': '3xx'}),
-                ('HTTPCode_Target_5XX_Count', {'label': '5xx'})
+                ('HTTPCode_Target_5XX_Count', {'color': '#d62728', 'label': '5xx'})
             ]
         },
         {
@@ -25,7 +25,7 @@ config = {
                 ('HTTPCode_Target_4XX_Count', {'color': '#9467bd', 'label': '4xx'}),
                 ('HTTPCode_Target_2XX_Count', {'color': '#2ca02c', 'label': '2xx'}),
                 ('HTTPCode_Target_3XX_Count', {'color': '#e377c2', 'label': '3xx'}),
-                ('HTTPCode_Target_5XX_Count', {'label': '5xx', 'color': '#d62728'})
+                ('HTTPCode_Target_5XX_Count', {'color': '#d62728', 'label': '5xx'})
             ]
         },
         {
