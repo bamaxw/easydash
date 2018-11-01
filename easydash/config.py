@@ -57,6 +57,14 @@ config = {
             ]
         }
     ],
+    ('AWS/ApplicationELB', ('TargetGroup', 'LoadBalancer')): [
+        {
+            'name': 'HealthyHostCount',
+            'metrics': [
+                ['HealthyHostCount', {'color': '#2ca02c', 'stat': 'Average'}]
+            ]
+        }
+    ],
     ('AWS/ApplicationELB', 'TargetGroup'): [
         'RequestCountPerTarget'
     ],

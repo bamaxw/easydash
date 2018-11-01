@@ -87,7 +87,7 @@ class ServiceDashboard(Dashboard):
     default_widgets = [
         'ECSCPU',                'ECSMemory',              'ALBRequestCount',           'ALBRequestCountPerTarget',
         'ALBTargetResponseTime', 'ALBTargetSuccessCodes',  'ALBTargetFailedCodes',      'ALBResponseCodes',
-        'ALBConsumedLCUs',       'ALBConnections',         'ALBStats'
+        'ALBConsumedLCUs',       'ALBConnections',         'ALBStats',                  'ALBHealthyHostCount'
     ]
     def __init__(self, service_name: str, server_type: str, cluster_name: str) -> dict:
         super().__init__(self.default_widgets, service_name=service_name, server_type=server_type, cluster_name=cluster_name)
