@@ -67,7 +67,13 @@ config = {
                 [ 'MemoryUtilization', { "stat": "Minimum", "color": "#2ca02c" } ],
                 [ "...", { 'stat': 'Average', "color": "#1f77b4" } ],
                 [ '...', { "stat": "Maximum", "color": "#d62728" } ],
-            ]
+            ],
+            'yAxis': {
+                'left': {
+                    'min': 0,
+                    'max': 100
+                }
+            }
         },
         {
             'name': 'CPU',
@@ -75,7 +81,13 @@ config = {
                 [ 'CPUUtilization', { "stat": "Minimum", "color": "#2ca02c" } ],
                 [ "...", { 'stat': 'Average', "color": "#1f77b4" } ],
                 [ '...', { "stat": "Maximum", "color": "#d62728" } ],
-            ]
+            ],
+            'yAxis': {
+                'left': {
+                    'min': 0,
+                    'max': 100
+                }
+            }
         }
     ]
 }

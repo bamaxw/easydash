@@ -73,6 +73,7 @@ class Properties:
         self.stacked = conf.pop('stacked', False)
         self.region = conf.pop('region', 'eu-west-1')
         self.period = conf.pop('period', 300)
+        self.yAxis = conf.pop('yAxis', None)
         self.name = conf.pop('name')
         self.title = conf.pop('title', self.make_title(self.name))
         self.metrics = Metrics(namespace, resource_type, conf)
@@ -94,7 +95,7 @@ class Properties:
             yield char
 
 
-    def generate(self, *resource_names, view=None, stacked=None, region=None, period=None, title=None, **kw):
+    def generate(self, *resource_names, view=None, stacked=None, region=None, period=None, title=None, yAxis=None, **kw):
         if view is None:
             view = self.view
         if stacked is None:
@@ -105,7 +106,9 @@ class Properties:
             period = self.period
         if title is None:
             title = self.title
-        return {
+        if yAxis is None:
+            yAxis = self.yAxis
+        properties = {
             'metrics': self.metrics.generate(*resource_names, **kw),
             'view': view,
             'stacked': stacked,
@@ -113,6 +116,9 @@ class Properties:
             'period': period,
             'title': title
         }
+        if yAxis is not None:
+            properties['yAxis'] = yAxis
+        return properties
 
 
 class Metrics:
