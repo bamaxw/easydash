@@ -10,10 +10,10 @@ def read(fname):
 _version_regex = r'^\s*__version__\s*=\s*(\"|\')(?P<version>.*)\1'
 def get_version():
     version_str = read("easydash/__init__.py")
-    matches = re.findall(_version_regex, version_str)
-    if len(matches) == 0:
+    match = re.search(_version_regex, version_str)
+    if match is None:
         raise ValueError("Failed to find version number")
-    return matches[0]
+    return match['version']
 
 setup(
     name="EasyDash",
@@ -28,7 +28,7 @@ setup(
         'boto3'
     ],
     dependency_links=[
-        'git+https://bitbucket.org/maxwasylow/helpers.git'
+        'https://bitbucket.org/maxwasylow/helpers.git#egg=helpers'
     ],
     entry_points={
         'console_scripts': [

@@ -4,6 +4,8 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+easydash = {editable = true, path = "."}
+helpers = {git = "https://bitbucket.org/maxwasylow/helpers.git"}
 
 [dev-packages]
 
