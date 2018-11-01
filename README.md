@@ -1,5 +1,6 @@
 # EasyDash
 
+
 ```
 Usage: dash <resource_type> <command> -s/--service service -c/--cluster cluster [-st/--server-type server-type]
                             resource_type:

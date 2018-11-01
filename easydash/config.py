@@ -4,6 +4,22 @@ config = {
         {'name': 'RequestCount', 'title': 'Total Request Count'},
         {'name': 'TargetResponseTime', 'title': 'ResponseTime'},
         {
+            'name': 'TargetFailedCodes',
+            'stacked': True,
+            'metrics': [
+                ('HTTPCode_Target_4XX_Count', {'color': '#9467bd', 'label': '4xx'}),
+                ('HTTPCode_Target_3XX_Count', {'color': '#e377c2', 'label': '3xx'}),
+                ('HTTPCode_Target_5XX_Count', {'label': '5xx'})
+            ]
+        },
+        {
+            'name': 'TargetSuccessCodes',
+            'stacked': True,
+            'metrics': [
+                ('HTTPCode_Target_2XX_Count', {'color': '#2ca02c', 'label': '2xx'}),
+            ]
+        },
+        {
             'name': 'TargetResponseCodes',
             'metrics': [
                 ('HTTPCode_Target_4XX_Count', {'color': '#9467bd', 'label': '4xx'}),
