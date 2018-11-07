@@ -32,7 +32,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'dash=easydash.command:main'
+            'dash=easydash.cli:cli'
         ]
     }
 )

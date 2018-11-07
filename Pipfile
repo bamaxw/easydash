@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 easydash = {editable = true, path = "."}
 helpers = {git = "https://bitbucket.org/maxwasylow/helpers.git"}
+click = "*"
 
 [dev-packages]
 

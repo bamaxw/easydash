@@ -1,59 +1,50 @@
-from .items.dashboards import ServiceDashboard
-from helpers.args import ArgParser
-from typing import Callable
-import boto3
+'''EasyDash command line utilities'''
+from functools import wraps
+import logging
+
+from decorator import decorator
+import click
 import json
 
+# from .items.dashboards import ServiceDashboard
+from .utils import with_options, print_help, setup_logging
+from .mock import Dashboard
+from .config import CONFIG
+from . import defaults
 
-class CliResource:
-    @classmethod
-    def map_command(cls, command: str) -> Callable:
-        if hasattr(cls, command):
-            return getattr(cls, command)
-        else:
-            raise ValueError(f"{cls.__name__} does not support command: '{command}'!")
-
-    @staticmethod
-    def get_args():
-        return ()
-
-    @staticmethod
-    def get_kwargs():
-        return {}
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
 
 
-class Service(CliResource):
-    @staticmethod
-    def deploy(service: str, server_type: str, cluster: str, region: str='eu-west-1'):
-        cloudwatch = boto3.client('cloudwatch', region_name=region)
-        response = cloudwatch.put_dashboard(
-            DashboardName=service,
-            DashboardBody=Service.gen(service, server_type, cluster)
-        )
-        return response
+@click.group()
+def cli():
+    '''EasyDash command line client'''
+    pass
 
-    @staticmethod
-    def get(service: str, server_type: str, cluster: str, **config) -> dict:
-        return ServiceDashboard(service, server_type, cluster, **config).generate()
+def base_cmd(cmd):
+    @wraps(cmd)
+    @click.argument('bundles', required=False, nargs=-1)
+    @click.option('file', '--file', '-f', type=click.File('r'))
+    @click.option('verbose', '-v', '--verbose', count=True)
+    def _wrapper(bundles, file, verbose, **options):
+        logger.debug(f'Received arguments:\n{options}')
+        setup_logging(verbose)
+        if not bundles and file is None:
+            print(cmd)
+            print_help(cmd)
+            raise SystemExit(f"Please provide either bundle name or config --file!")
+        if file:
+            config = json.load(file)
+            return cmd(dict(options, **config))
+        return cmd(bundles=bundles, **options)
+    return _wrapper
 
-    @staticmethod
-    def gen(service: str, server_type: str, cluster: str, **config) -> str:
-        return json.dumps(Service.get(service, server_type, cluster, **config))
-
-    @staticmethod
-    def show(service: str, server_type: str, cluster: str, **config) -> None:
-        print(json.dumps(Service.get(service, server_type, cluster), indent=4))
-
-    @staticmethod
-    def get_args():
-        args = ArgParser('dash ecs-service <command>')
-        service = args.register('service')
-        cluster = args.register('cluster')
-        server_type = args.register('server-type', short='-st', required=False)
-        args.validate()
-        return service, server_type or service, cluster
-
-
-map_resource = {
-    'ecs-service': Service
-}
+@cli.command('show')
+# @with_options(defaults.OPTIONS)
+@base_cmd
+@click.pass_context
+def show(ctx, bundles, **options):
+    '''Show CloudWatch dashboard config without deploying it'''
+    dashboard_command = Dashboard.get(bundles).show
+    ctx.forward(dashboard_command)
+    ctx.invoke(dashboard_command, **options)
