@@ -1,8 +1,17 @@
-from .items.dashboards import ServiceDashboard
-from ion.args import ArgParser
+from functools import wraps
 from typing import Callable
+import logging
+
+from decorator import decorator
+import ujson as json
 import boto3
-import json
+
+from ion.args import ArgParser
+
+from .items.dashboards import ServiceDashboard
+from .utils import print_help, setup_logging
+
+log = logging.getLogger(__name__)
 
 
 class CliResource:
@@ -24,7 +33,7 @@ class CliResource:
 
 class Service(CliResource):
     @staticmethod
-    def deploy(service: str, server_type: str, cluster: str, region: str='eu-west-1'):
+    def deploy(service: str, server_type: str, cluster: str, region: str = 'eu-west-1'):
         cloudwatch = boto3.client('cloudwatch', region_name=region)
         response = cloudwatch.put_dashboard(
             DashboardName=service,
@@ -54,6 +63,17 @@ class Service(CliResource):
         return service, server_type or service, cluster
 
 
-map_resource = {
-    'ecs-service': Service
-}
+
+def cli():
+    args = ArgParser('dash <resource-name> <command>')
+    resource_name = args.register('resource', named=False)
+    command = args.register('command', named=False)
+    args.validate()
+    resource_maker = {'ecs-service': Service}[resource_name]
+    cmd_args = resource_maker.get_args()
+    if command == 'show':
+        print(resource_maker.show(*cmd_args))
+    elif command == 'deploy':
+        resource_maker.deploy(*cmd_args)
+    else:
+        print(f'no such command {command!r}')
