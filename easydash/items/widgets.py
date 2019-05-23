@@ -1,5 +1,5 @@
 from ..config import config, section_by_namespace
-from helpers.list import as_list
+from ion.list import as_list
 import json
 
 

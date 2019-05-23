@@ -1,4 +1,4 @@
-from helpers.cache import remember
+from ion.cache import remember
 from .widgets import Widgets
 import boto3
 
@@ -87,7 +87,8 @@ class ServiceDashboard(Dashboard):
     default_widgets = [
         'ECSCPU',                'ECSMemory',              'ALBRequestCount',           'ALBRequestCountPerTarget',
         'ALBTargetResponseTime', 'ALBTargetSuccessCodes',  'ALBTargetFailedCodes',      'ALBResponseCodes',
-        'ALBConsumedLCUs',       'ALBConnections',         'ALBStats',                  'ALBHealthyHostCount'
+        'ALBConsumedLCUs',       'ALBConnections',         'ALBStats',                  'ALBTargetStats',
+        'ALBHealthyHostCount'
     ]
     def __init__(self, service_name: str, server_type: str, cluster_name: str) -> dict:
         super().__init__(self.default_widgets, service_name=service_name, server_type=server_type, cluster_name=cluster_name)

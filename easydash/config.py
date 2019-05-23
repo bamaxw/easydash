@@ -1,8 +1,13 @@
+GREEN = '#47cc7a'
+RED = '#f4415f'
+BLUE = '#4286f4'
+VIOLET = '#9467bd'
+
 config = {
     ('AWS/ApplicationELB', 'LoadBalancer'): [
         'ConsumedLCUs',
         {'name': 'RequestCount', 'title': 'Total Request Count'},
-        {'name': 'TargetResponseTime', 'title': 'ResponseTime'},
+        {'name': 'TargetResponseTime', 'title': 'Response Time'},
         {
             'name': 'TargetFailedCodes',
             'stacked': True,
@@ -46,14 +51,33 @@ config = {
         {
             'name': 'Stats',
             'metrics': [
-                [ { "expression": "SUM([m3,m4,m5,m6])*100/SUM(METRICS())", "label": "Availability %", "id": "e1", "stat": "Sum", "color": "#1f77b4" } ],
-                [ { "expression": "m5*100/SUM([m3,m4,m5,m6])", "label": "Response OK %", "id": "e2", "color": "#2ca02c" } ],
-                ["HTTPCode_ELB_5XX_Count", { "id": "m1", "visible": False, "stat": "Sum" } ],
-                ["HTTPCode_ELB_4XX_Count", { "id": "m2", "visible": False, "stat": "Sum" } ],
-                ["HTTPCode_Target_3XX_Count", { "id": "m3", "visible": False, "stat": "Sum" } ],
-                ["HTTPCode_Target_5XX_Count", { "id": "m4", "visible": False, "stat": "Sum" } ],
-                ["HTTPCode_Target_2XX_Count", { "id": "m5", "visible": False, "stat": "Sum" } ],
-                ["HTTPCode_Target_4XX_Count", { "id": "m6", "visible": False, "stat": "Sum" } ]
+                ["HTTPCode_ELB_5XX_Count", {"id": "elb5", "visible": False, "stat": "Sum"}],
+                ["HTTPCode_ELB_4XX_Count", {"id": "elb4", "visible": False, "stat": "Sum"}],
+                ["HTTPCode_Target_3XX_Count", {"id": "target3", "visible": False, "stat": "Sum"}],
+                ["HTTPCode_Target_5XX_Count", {"id": "target5", "visible": False, "stat": "Sum"}],
+                ["HTTPCode_Target_2XX_Count", {"id": "target2", "visible": False, "stat": "Sum"}],
+                ["HTTPCode_Target_4XX_Count", {"id": "target4", "visible": False, "stat": "Sum"}],
+                [{'expression': 'elb4 + elb5', 'id': 'elb', 'visible': False}],
+                [{'expression': 'target2 + target3 + target4 + target5', 'id': 'target', 'visible': False}],
+                [{'expression': 'target + elb', 'id': 'all', 'visible': False}],
+                [{'expression': 'target * 100 / SUM([target + elb5])', 'label': 'Availability %', 'color': BLUE}],
+                [{'expression': 'target2 * 100 / SUM([target2, target5])', 'label': 'OK %', 'color': GREEN}],
+            ]
+        },
+        {
+            'name': 'TargetStats',
+            'title': 'Target Stats',
+            'stacked': True,
+            'metrics': [
+                ["HTTPCode_Target_3XX_Count", {"id": "target3", "visible": False, "stat": "Sum"}],
+                ["HTTPCode_Target_5XX_Count", {"id": "target5", "visible": False, "stat": "Sum"}],
+                ["HTTPCode_Target_2XX_Count", {"id": "target2", "visible": False, "stat": "Sum"}],
+                ["HTTPCode_Target_4XX_Count", {"id": "target4", "visible": False, "stat": "Sum"}],
+                [{'expression': 'target2 + target3 + target4 + target5', 'id': 'target', 'visible': False}],
+                [{'expression': 'target3 * 100 / target', 'label': '3xx', 'color': '#fca80c'}],
+                [{'expression': 'target4 * 100 / target', 'label': '4xx', 'color': VIOLET}],
+                [{'expression': 'target5 * 100 / target', 'label': '5xx', 'color': RED}],
+                [{'expression': 'target2 * 100 / target', 'label': '2xx', 'color': GREEN}],
             ]
         }
     ],
@@ -61,7 +85,8 @@ config = {
         {
             'name': 'HealthyHostCount',
             'metrics': [
-                ['HealthyHostCount', {'color': '#2ca02c', 'stat': 'Average'}]
+                ['HealthyHostCount', {'color': '#2ca02c', 'stat': 'Average'}],
+                ['UnHealthyHostCount', {'color': '#f42440', 'stat': 'Average'}]
             ]
         }
     ],
@@ -72,9 +97,9 @@ config = {
         {
             'name': 'Memory',
             'metrics': [
-                [ 'MemoryUtilization', { "stat": "Minimum", "color": "#2ca02c" } ],
-                [ "...", { 'stat': 'Average', "color": "#1f77b4" } ],
-                [ '...', { "stat": "Maximum", "color": "#d62728" } ],
+                ['MemoryUtilization', {"stat": "Minimum", "color": "#2ca02c"}],
+                ["...", {'stat': 'Average', "color": "#1f77b4"}],
+                ['...', {"stat": "Maximum", "color": "#d62728"}],
             ],
             'yAxis': {
                 'left': {
@@ -86,9 +111,9 @@ config = {
         {
             'name': 'CPU',
             'metrics': [
-                [ 'CPUUtilization', { "stat": "Minimum", "color": "#2ca02c" } ],
-                [ "...", { 'stat': 'Average', "color": "#1f77b4" } ],
-                [ '...', { "stat": "Maximum", "color": "#d62728" } ],
+                ['CPUUtilization', {"stat": "Minimum", "color": "#2ca02c"}],
+                ["...", {'stat': 'Average', "color": "#1f77b4"}],
+                ['...', {"stat": "Maximum", "color": "#d62728"}],
             ],
             'yAxis': {
                 'left': {
