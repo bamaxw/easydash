@@ -7,7 +7,10 @@ config = {
     ('AWS/ApplicationELB', 'LoadBalancer'): [
         'ConsumedLCUs',
         {'name': 'RequestCount', 'title': 'Total Request Count'},
-        {'name': 'TargetResponseTime', 'title': 'Response Time'},
+        {'name': 'TargetResponseTime',
+         'title': 'Response Time',
+         'stat': 'Average'
+        },
         {
             'name': 'TargetFailedCodes',
             'stacked': True,

@@ -55,14 +55,18 @@ class Widget:
         if type is None:
             type = self.type
         properties = self.properties.generate(*resource_names, **kw)
-        return {
+        dct = {}
+        if 'stat' in properties:
+            dct['stat'] = properties.pop('stat')
+        dct = dict(dct, **{
             'x': x,
             'y': y,
             'type': type,
             'width': properties.pop('width', width),
             'height': properties.pop('height', height),
             'properties': properties
-        }
+        })
+        return dct
 
 
 class Properties:
@@ -78,9 +82,10 @@ class Properties:
         self.yAxis = conf.pop('yAxis', None)
         self.width = conf.pop('width', 6)
         self.height = conf.pop('height', 6)
+        self.stat = conf.pop('stat', 'Sum')
         self.name = conf.pop('name')
         self.title = conf.pop('title', self.make_title(self.name))
-        self.metrics = Metrics(namespace, resource_type, conf)
+        self.metrics = Metrics(namespace, resource_type, conf, stat=self.stat)
 
     def make_title(self, name):
         return ''.join(self._make_title(name))
@@ -108,6 +113,7 @@ class Properties:
                  yAxis=None,
                  width: Optional[int] = None,
                  height: Optional[int] = None,
+                 stat: Optional[str] = None,
                  **kw):
         if view is None:
             view = self.view
@@ -123,8 +129,8 @@ class Properties:
             yAxis = self.yAxis
         if width is None:
             width = self.width
-        if height is None:
-            height = self.height
+        height = height or self.height
+        stat = stat or self.stat
         properties = {
             'metrics': self.metrics.generate(*resource_names, **kw),
             'view': view,
@@ -133,7 +139,8 @@ class Properties:
             'period': period,
             'title': title,
             'width': width,
-            'height': height
+            'height': height,
+            'stat': stat
         }
         if yAxis is not None:
             properties['yAxis'] = yAxis
@@ -141,10 +148,11 @@ class Properties:
 
 
 class Metrics:
-    def __init__(self, namespace, resource_type, conf):
+    def __init__(self, namespace, resource_type, conf, stat: Optional[str] = None):
         self.namespace = namespace
         self.resource_type = resource_type
-        self.metrics = [Metric(namespace, resource_type, metric) for metric in conf['metrics']]
+        self.metrics = [Metric(namespace, resource_type, metric, stat=stat)
+                        for metric in conf['metrics']]
 
     def generate(self, *resource_names, **kw):
         metrics = [
@@ -168,18 +176,18 @@ class Metrics:
 
 
 class Metric:
-    def __init__(self, namespace, resource_type, conf):
-        if type(conf) is str:
+    def __init__(self, namespace, resource_type, conf, stat=None):
+        if isinstance(conf, str):
             self.namespace = namespace
             self.resource_type = resource_type
             self.metric_name = conf
-            self.config = {'stat': 'Sum'}
+            self.config = {'stat': stat or 'Sum'}
             return
         if len(conf) <= 2:
             self.namespace = namespace
             self.resource_type = resource_type
             if len(conf) == 1:
-                if type(conf[0]) is str:
+                if isinstance(conf[0], str):
                     self.metric_name = conf
                     self.config = {}
                 else:
@@ -193,15 +201,20 @@ class Metric:
             else:
                 raise ValueError(f"Couldn't parse conf: {conf}")
         if 'stat' not in self.config:
-            self.config['stat'] = 'Sum'
+            self.config['stat'] = stat or 'Sum'
 
     def generate(self, *resource_names, **kw):
         if self.metric_name is None:
             return [dict(self.config, **kw)]
-        resource_types = [self.resource_type] if type(self.resource_type) is str else self.resource_type
+        resource_types = ([self.resource_type]
+                          if isinstance(self.resource_type, str)
+                          else self.resource_type)
         if self.metric_name == '...':
             return ['...', dict(self.config, **kw)]
-        return [self.namespace, self.metric_name, *[elem for pair in zip(resource_types, resource_names) for elem in pair], dict(self.config, **kw)]
+        return [self.namespace,
+                self.metric_name,
+                *[elem for pair in zip(resource_types, resource_names) for elem in pair],
+                dict(self.config, **kw)]
 
 
 for (namespace, resource_type), conf in config.items():
