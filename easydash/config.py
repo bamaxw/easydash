@@ -43,6 +43,7 @@ config = {
         'TargetResponseCount',
         {
             'name': 'ResponseCodes',
+            'title': 'Load Balancer Responses',
             'metrics': [
                 ('HTTPCode_ELB_4XX_Count', {'color': '#9467bd', 'label': '4xx'}),
                 ('HTTPCode_ELB_5XX_Count', {'color': '#d62728', 'label': '5xx'})
@@ -50,6 +51,7 @@ config = {
         },
         {
             'name': 'Stats',
+            'height': 12,
             'metrics': [
                 ["HTTPCode_ELB_5XX_Count", {"id": "elb5", "visible": False, "stat": "Sum"}],
                 ["HTTPCode_ELB_4XX_Count", {"id": "elb4", "visible": False, "stat": "Sum"}],
@@ -68,6 +70,7 @@ config = {
             'name': 'TargetStats',
             'title': 'Target Stats',
             'stacked': True,
+            'height': 12,
             'metrics': [
                 ["HTTPCode_Target_3XX_Count", {"id": "target3", "visible": False, "stat": "Sum"}],
                 ["HTTPCode_Target_5XX_Count", {"id": "target5", "visible": False, "stat": "Sum"}],
@@ -91,7 +94,15 @@ config = {
         }
     ],
     ('AWS/ApplicationELB', 'TargetGroup'): [
-        'RequestCountPerTarget'
+        'RequestCountPerTarget',
+        {
+            'name': 'RequestCountPerTargetPerSecond',
+            'title': 'Request Count Per Target Per Second',
+            'metrics': [
+                ['RequestCountPerTarget', {'id': 'reqs', 'visible': False, 'stat': 'Sum'}],
+                [{'expression': 'reqs / PERIOD(reqs)', 'label': 'rps'}]
+            ]
+        }
     ],
     ('AWS/ECS', ('ServiceName', 'ClusterName')): [
         {

@@ -29,16 +29,20 @@ class Dashboard:
                 x = x % max_row
                 y = y + column_size
 
-    def normalize(self, widget_def):
-        if type(widget_def) is not tuple:
+    @staticmethod
+    def normalize(widget_def):
+        '''
+        Gets widget definition no matter in what form (str, str, and args, etc)
+        and returns the full form of this widget's definition
+        '''
+        if not isinstance(widget_def, tuple):
             return widget_def, (), {}
         if len(widget_def) == 1:
             return widget_def[0], (), {}
         if len(widget_def) == 2:
             if isinstance(widget_def[1], (list, tuple)):
                 return widget_def[0], widget_def[1], {}
-            else:
-                return widget_def[0], (), widget_def[1]
+            return widget_def[0], (), widget_def[1]
         return widget_def
 
     def get_resource_names(self, types: list) -> list:
@@ -90,5 +94,14 @@ class ServiceDashboard(Dashboard):
         'ALBConsumedLCUs',       'ALBConnections',         'ALBStats',                  'ALBTargetStats',
         'ALBHealthyHostCount'
     ]
-    def __init__(self, service_name: str, server_type: str, cluster_name: str) -> dict:
-        super().__init__(self.default_widgets, service_name=service_name, server_type=server_type, cluster_name=cluster_name)
+    default_widgets = [
+        'ECSCPU',                'ECSMemory',                'ALBConnections',                    'ALBHealthyHostCount',
+        'ALBRequestCount',       'ALBRequestCountPerTarget', 'ALBRequestCountPerTargetPerSecond', 'ALBTargetResponseTime',
+        'ALBTargetStats',        'ALBStats',                 'ALBTargetSuccessCodes',             'ALBResponseCodes',
+        None,                    None,                       'ALBTargetFailedCodes'
+    ]
+    def __init__(self, service_name: str, server_type: str, cluster_name: str) -> None:
+        super().__init__(self.default_widgets,
+                         service_name=service_name,
+                         server_type=server_type,
+                         cluster_name=cluster_name)

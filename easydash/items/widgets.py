@@ -1,3 +1,4 @@
+from __future__ import annotations
 from ..config import config, section_by_namespace
 from ion.list import as_list
 import json
@@ -53,13 +54,14 @@ class Widget:
             raise ValueError(f'Must provide arguments: {self.args} to {self.qualname}!')
         if type is None:
             type = self.type
+        properties = self.properties.generate(*resource_names, **kw)
         return {
             'x': x,
             'y': y,
             'type': type,
-            'width': width,
-            'height': height,
-            'properties': self.properties.generate(*resource_names, **kw)
+            'width': properties.pop('width', width),
+            'height': properties.pop('height', height),
+            'properties': properties
         }
 
 
@@ -74,6 +76,8 @@ class Properties:
         self.region = conf.pop('region', 'eu-west-1')
         self.period = conf.pop('period', 300)
         self.yAxis = conf.pop('yAxis', None)
+        self.width = conf.pop('width', 6)
+        self.height = conf.pop('height', 6)
         self.name = conf.pop('name')
         self.title = conf.pop('title', self.make_title(self.name))
         self.metrics = Metrics(namespace, resource_type, conf)
@@ -94,8 +98,17 @@ class Properties:
                     yield ' '
             yield char
 
-
-    def generate(self, *resource_names, view=None, stacked=None, region=None, period=None, title=None, yAxis=None, **kw):
+    def generate(self,
+                 *resource_names,
+                 view=None,
+                 stacked=None,
+                 region=None,
+                 period=None,
+                 title=None,
+                 yAxis=None,
+                 width: Optional[int] = None,
+                 height: Optional[int] = None,
+                 **kw):
         if view is None:
             view = self.view
         if stacked is None:
@@ -108,13 +121,19 @@ class Properties:
             title = self.title
         if yAxis is None:
             yAxis = self.yAxis
+        if width is None:
+            width = self.width
+        if height is None:
+            height = self.height
         properties = {
             'metrics': self.metrics.generate(*resource_names, **kw),
             'view': view,
             'stacked': stacked,
             'region': region,
             'period': period,
-            'title': title
+            'title': title,
+            'width': width,
+            'height': height
         }
         if yAxis is not None:
             properties['yAxis'] = yAxis
