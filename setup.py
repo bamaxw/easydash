@@ -24,15 +24,7 @@ setup(
     long_description=read("README.md"),
     packages=find_packages(),
     python_requires=">=3.6",
-    install_requires=[
-        'boto3'
-    ],
-    dependency_links=[
-        'https://bitbucket.org/maxwasylow/helpers.git#egg=helpers'
-    ],
-    entry_points={
-        'console_scripts': [
-            'dash=easydash.cli:cli'
-        ]
-    }
+    install_requires=['boto3'],
+    dependency_links=['https://github.com/bamaxw/ion.git'],
+    entry_points={'console_scripts': ['dash=easydash.cli:cli']}
 )
