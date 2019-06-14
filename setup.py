@@ -10,7 +10,7 @@ def read(fname):
 setup(
     name="EasyDash",
     author="Maximus Wasylow",
-    version='0.0.0',
+    version='0.0.1',
     author_email="bamwasylow@gmail.com",
     description="A command line tool for easy cloud-watch dashboard generation",
     long_description=read("README.md"),
